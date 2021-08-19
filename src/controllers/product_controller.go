@@ -65,3 +65,46 @@ func ListProducts(c *gin.Context) {
 	}
 	c.JSON(200, products)
 }
+
+func UpdateProduct(c *gin.Context) {
+	db := database.GetDatabase()
+	var product models.Product
+	err := c.ShouldBindJSON(&product)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": "cannot bind json: " + err.Error(),
+		})
+		return
+	}
+	createErr := db.Save(&product).Error
+	if createErr != nil {
+		c.JSON(404, gin.H{
+			"error": "cannot update product: " + createErr.Error(),
+		})
+		return
+	}
+	c.JSON(200, product)
+}
+
+func DeleteProduct(c *gin.Context) {
+	id := c.Param("id")
+	parsedId, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": "ID has to be an integer",
+		})
+		return
+	}
+
+	db := database.GetDatabase()
+
+	err = db.Delete(&models.Product{}, parsedId).Error
+	if err != nil {
+		c.JSON(404, gin.H{
+			"error": "product not found: " + err.Error(),
+		})
+		return
+	}
+
+	c.Status(204)
+}
