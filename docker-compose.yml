@@ -1,0 +1,23 @@
+version: "3.7"
+
+services:
+  db:
+    build:
+      context: .
+      dockerfile: .dockerfile
+    image: github.com/ygorrodriguesmeli/gorestapi
+    container_name: webapi-golang
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "25432:5432"
+    environment:
+      POSTGRES_DB: products
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 123456
+      PGDATA: /var/lib/postgresql/data/webapi-golang
+    volumes:
+      - webapi-golang:/var/lib/postgresql/data
+
+volumes:
+  webapi-golang:
