@@ -1,9 +1,67 @@
 package controllers
 
-import "github.com/gin-gonic/gin"
+import (
+	"strconv"
 
-func ShowProduct(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"message": "hello",
-	})
+	"github.com/ygorrodriguesmeli/gorestapi/src/database"
+	"github.com/ygorrodriguesmeli/gorestapi/src/models"
+
+	"github.com/gin-gonic/gin"
+)
+
+func GetProductById(c *gin.Context) {
+	id := c.Param("id")
+	parsedId, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": "ID has to be an integer",
+		})
+		return
+	}
+
+	db := database.GetDatabase()
+
+	var product models.Product
+	err = db.First(&product, parsedId).Error
+	if err != nil {
+		c.JSON(404, gin.H{
+			"error": "product not found: " + err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200, product)
+}
+
+func CreateProduct(c *gin.Context) {
+	db := database.GetDatabase()
+	var product models.Product
+	err := c.ShouldBindJSON(&product)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": "cannot create product: " + err.Error(),
+		})
+		return
+	}
+	err := db.Create(&product).Error
+	if err != nil {
+		c.JSON(404, gin.H{
+			"error": "cannot create product: " + err.Error(),
+		})
+		return
+	}
+	c.JSON(200, product)
+}
+
+func ListProducts(c *gin.Context) {
+	db := database.GetDatabase()
+	var products []models.Product
+	err := db.Find(&products)
+	if err != nil {
+		c.JSON(404, gin.H{
+			"error": "cannot list products: " + err.Error(),
+		})
+		return
+	}
+	c.JSON(200, products)
 }

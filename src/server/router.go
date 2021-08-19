@@ -7,6 +7,8 @@ import (
 )
 
 func ConfigRoutes(router *gin.Engine) *gin.Engine {
-	router.GET("/product", controllers.ShowProduct)
+	router.GET("/product/:id", controllers.GetProductById)
+	router.GET("/product", controllers.ListProducts)
+	router.POST("/product", controllers.CreateProduct)
 	return router
 }
