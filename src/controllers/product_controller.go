@@ -39,14 +39,14 @@ func CreateProduct(c *gin.Context) {
 	err := c.ShouldBindJSON(&product)
 	if err != nil {
 		c.JSON(400, gin.H{
-			"error": "cannot create product: " + err.Error(),
+			"error": "cannot bind json: " + err.Error(),
 		})
 		return
 	}
-	err := db.Create(&product).Error
-	if err != nil {
+	createErr := db.Create(&product).Error
+	if createErr != nil {
 		c.JSON(404, gin.H{
-			"error": "cannot create product: " + err.Error(),
+			"error": "cannot create product: " + createErr.Error(),
 		})
 		return
 	}
@@ -56,7 +56,7 @@ func CreateProduct(c *gin.Context) {
 func ListProducts(c *gin.Context) {
 	db := database.GetDatabase()
 	var products []models.Product
-	err := db.Find(&products)
+	err := db.Find(&products).Error
 	if err != nil {
 		c.JSON(404, gin.H{
 			"error": "cannot list products: " + err.Error(),

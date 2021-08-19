@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/ygorrodriguesmeli/gorestapi/src/database/migrations"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -11,7 +12,7 @@ import (
 var db *gorm.DB
 
 func StartDB() {
-	str := "host=localhost port=5432 user=admin dbname=products sslmode=disable password=123456"
+	str := "host=localhost port=25432 user=admin dbname=products sslmode=disable password=123456"
 	database, err := gorm.Open(postgres.Open(str), &gorm.Config{})
 	if err != nil {
 		log.Fatal("error: ", err)
@@ -24,6 +25,22 @@ func StartDB() {
 	config.SetMaxIdleConns(10)
 	config.SetMaxOpenConns(100)
 	config.SetConnMaxLifetime(time.Hour)
+
+	migrations.RunMigrations(db)
+}
+
+func CloseConn() error {
+	config, err := db.DB()
+	if err != nil {
+		return err
+	}
+
+	err = config.Close()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func GetDatabase() *gorm.DB {
