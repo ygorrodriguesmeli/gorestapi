@@ -1,10 +1,12 @@
 package controllers
 
 import (
+	"net/http"
 	"strconv"
 
 	"github.com/ygorrodriguesmeli/gorestapi/src/database"
 	"github.com/ygorrodriguesmeli/gorestapi/src/models"
+	"github.com/ygorrodriguesmeli/gorestapi/src/services"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,27 +18,14 @@ var (
 type productController struct{}
 
 func (controller *productController) GetProductById(c *gin.Context) {
-	id := c.Param("id")
-	parsedId, err := strconv.Atoi(id)
+	product, err := services.ProductService.GetProductById(c.Param("id"))
 	if err != nil {
-		c.JSON(400, gin.H{
-			"error": "ID has to be an integer",
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
-
-	db := database.GetDatabase()
-
-	var product models.Product
-	err = db.First(&product, parsedId).Error
-	if err != nil {
-		c.JSON(404, gin.H{
-			"error": "product not found: " + err.Error(),
-		})
-		return
-	}
-
-	c.JSON(200, product)
+	c.JSON(http.StatusOK, product)
 }
 
 func (controller *productController) CreateProduct(c *gin.Context) {
