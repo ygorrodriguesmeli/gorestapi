@@ -9,7 +9,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetProductById(c *gin.Context) {
+var (
+	ProductController = productController{}
+)
+
+type productController struct{}
+
+func (controller *productController) GetProductById(c *gin.Context) {
 	id := c.Param("id")
 	parsedId, err := strconv.Atoi(id)
 	if err != nil {
@@ -33,7 +39,7 @@ func GetProductById(c *gin.Context) {
 	c.JSON(200, product)
 }
 
-func CreateProduct(c *gin.Context) {
+func (controller *productController) CreateProduct(c *gin.Context) {
 	db := database.GetDatabase()
 	var product models.Product
 	err := c.ShouldBindJSON(&product)
@@ -53,7 +59,7 @@ func CreateProduct(c *gin.Context) {
 	c.JSON(200, product)
 }
 
-func ListProducts(c *gin.Context) {
+func (controller *productController) ListProducts(c *gin.Context) {
 	db := database.GetDatabase()
 	var products []models.Product
 	err := db.Find(&products).Error
@@ -66,7 +72,7 @@ func ListProducts(c *gin.Context) {
 	c.JSON(200, products)
 }
 
-func UpdateProduct(c *gin.Context) {
+func (controller *productController) UpdateProduct(c *gin.Context) {
 	db := database.GetDatabase()
 	var product models.Product
 	err := c.ShouldBindJSON(&product)
@@ -86,7 +92,7 @@ func UpdateProduct(c *gin.Context) {
 	c.JSON(200, product)
 }
 
-func DeleteProduct(c *gin.Context) {
+func (controller *productController) DeleteProduct(c *gin.Context) {
 	id := c.Param("id")
 	parsedId, err := strconv.Atoi(id)
 	if err != nil {
