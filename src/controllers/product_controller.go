@@ -20,9 +20,7 @@ type productController struct{}
 func (controller *productController) GetProductById(c *gin.Context) {
 	product, err := services.ProductService.GetProductById(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		c.JSON(err.Status(), err)
 		return
 	}
 	c.JSON(http.StatusOK, product)
